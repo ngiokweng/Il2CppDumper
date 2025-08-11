@@ -986,21 +986,9 @@ namespace Il2CppDumper
             }
             else
             {
-                if (il2Cpp is PE && !info.IsValueType)
-                {
-                    if (il2Cpp.Is32Bit)
-                    {
-                        sb.Append($"struct __declspec(align(4)) {info.TypeName}_Fields {{\n");
-                    }
-                    else
-                    {
-                        sb.Append($"struct __declspec(align(8)) {info.TypeName}_Fields {{\n");
-                    }
-                }
-                else
-                {
-                    sb.Append($"struct {info.TypeName}_Fields {{\n");
-                }
+
+               sb.Append($"struct {info.TypeName}_Fields {{\n");
+                
             }
             foreach (var field in info.Fields)
             {

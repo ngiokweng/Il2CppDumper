@@ -28,6 +28,7 @@ namespace Il2CppDumper
             readClass = GetType().GetMethod("ReadClass", Type.EmptyTypes);
             readClassArray = GetType().GetMethod("ReadClassArray", new[] { typeof(long) });
             genericMethodCache = new();
+            // 自動推斷目標類型的new運算式
             attributeCache = new();
         }
 
@@ -115,6 +116,7 @@ namespace Il2CppDumper
         public T ReadClass<T>() where T : new()
         {
             var type = typeof(T);
+            // 判斷是否CLR定義的原始類型( 如bool, byte, int, uint... )
             if (type.IsPrimitive)
             {
                 return (T)ReadPrimitive(type);
@@ -135,6 +137,10 @@ namespace Il2CppDumper
                     if (versionAttributes?.Length > 0)
                     {
                         var read = false;
+                        /*
+                         一些類成員指定了如: [Version(Min = 19, Max = 24.5)]的版本信息
+                          這裡正是根據此來適配不同il2cpp版本的類結構
+                         */
                         foreach (var versionAttribute in versionAttributes)
                         {
                             if (Version >= versionAttribute.Min && Version <= versionAttribute.Max)
@@ -148,6 +154,7 @@ namespace Il2CppDumper
                             continue;
                         }
                     }
+                    // 通過反射設置類字段的值
                     var fieldType = i.FieldType;
                     if (fieldType.IsPrimitive)
                     {
